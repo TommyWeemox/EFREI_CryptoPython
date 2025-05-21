@@ -14,6 +14,15 @@ def hello_world():
 key = Fernet.generate_key()
 f = Fernet(key)
 
+@app.route('/decrypt/<string:valeur>')
+def decryptage(valeur):
+    try:
+        valeur_bytes = valeur.encode()
+        decrypted = f.decrypt(valeur_bytes)
+        return f"Valeur décryptée : {decrypted.decode()}"
+    except:
+        return "Erreur : valeur non déchiffrable"
+
 @app.route('/encrypt/<string:valeur>')
 def encryptage(valeur):
     valeur_bytes = valeur.encode()  # Conversion str -> bytes
