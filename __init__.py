@@ -8,7 +8,7 @@ app = Flask(__name__)
 def hello_world():
     return render_template('hello.html')  # Fichier hello.html requis dans /templates
 
-# Génère une clé globale (utilisée dans /encrypt/<valeur> et /decrypt/<valeur>)
+# Génère une clé globalhhe (utilisée dans /encrypt/<valeur> et /decrypt/<valeur>)
 global_key = Fernet.generate_key()
 global_f = Fernet(global_key)
 
