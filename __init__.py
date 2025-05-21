@@ -1,32 +1,30 @@
 from cryptography.fernet import Fernet
-from flask import Flask, render_template_string, render_template, jsonify
-from flask import render_template
-from flask import json
-from urllib.request import urlopen
+from flask import Flask, render_template, jsonify, request
 import sqlite3
 
-app = Flask(name)
+app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
-    return render_template('hello.html') #COMM2
+    return render_template('hello.html')  # Fichier hello.html requis dans /templates
 
-key = Fernet.generate_key()
-f = Fernet(key)
+# Génère une clé globale (utilisée dans /encrypt/<valeur> et /decrypt/<valeur>)
+global_key = Fernet.generate_key()
+global_f = Fernet(global_key)
 
-@app.route('/encrypt/<string:valeur>')
+@app.route('/encrypt/<string:valeur>', methods=['GET'])
 def encryptage(valeur):
-    valeur_bytes = valeur.encode()  # Conversion str -> bytes
-    token = f.encrypt(valeur_bytes)  # Encrypt la valeur
-    return f"Valeur encryptée : {token.decode()}"  # Retourne le token en str
+    valeur_bytes = valeur.encode()  # str -> bytes
+    token = global_f.encrypt(valeur_bytes)  # chiffrement
+    return f"Valeur encryptée : {token.decode()}"  # bytes -> str
 
-@app.route('/decrypt/<string:valeur>')
+@app.route('/decrypt/<string:valeur>', methods=['GET'])
 def decryptage(valeur):
     try:
         valeur_bytes = valeur.encode()
-        decrypted = f.decrypt(valeur_bytes)
+        decrypted = global_f.decrypt(valeur_bytes)
         return f"Valeur décryptée : {decrypted.decode()}"
-    except:
+    except Exception:
         return "Erreur : valeur non déchiffrable"
 
 @app.route('/encrypt/', methods=['POST'])
@@ -48,6 +46,5 @@ def generate_key():
     key = Fernet.generate_key().decode()
     return jsonify({'key': key})
 
-
-if name == "main":
-  app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
